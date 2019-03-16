@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Thread extends Model
 {
     protected $guarded = []; // 意味所有属性均可更新，后期会修复此安全隐患
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('replyCount',function ($builder){
+            $builder->withCount('replies');
+        });
+    }
     public function path()
     {
         return "/threads/{$this->channel->slug}/{$this->id}";
@@ -31,6 +40,9 @@ class Thread extends Model
     {
         $this->replies()->create($reply);
     }
-
+    public function scopeFilter($query,$filters)
+    {
+        return $filters->apply($query);
+    }
 
 }

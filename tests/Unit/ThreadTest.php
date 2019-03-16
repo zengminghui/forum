@@ -50,4 +50,16 @@ class ThreadTest extends TestCase
 
         $this->assertInstanceOf('App\Channel',$thread->channel);
     }
+    /** @test */
+    public function a_user_can_filter_threads_by_any_username()
+    {
+        $this->signIn(create('App\User',['name' => 'NoNo1']));
+
+        $threadByNoNo1 = create('App\Thread',['user_id' => auth()->id()]);
+        $threadNotByNoNo1 = create('App\Thread');
+
+        $this->get('threads?by=NoNo1')
+            ->assertSee($threadByNoNo1->title)
+            ->assertDontSee($threadNotByNoNo1->title);
+    }
 }
