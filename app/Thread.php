@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Thread extends Model
 {
     protected $guarded = []; // 意味所有属性均可更新，后期会修复此安全隐患
+    protected $with = ['creator','channel'];
 
     protected static function boot()
     {
@@ -14,6 +15,10 @@ class Thread extends Model
 
         static::addGlobalScope('replyCount',function ($builder){
             $builder->withCount('replies');
+        });
+
+        static::deleting(function ($thread) {
+            $thread->replies()->delete();
         });
     }
     public function path()
